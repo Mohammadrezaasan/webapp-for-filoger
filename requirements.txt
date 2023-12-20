@@ -3,3 +3,9 @@ numpy
 pandas
 pydeck
 streamlit
+opencv-python-headless
+imageio
+Pillow
+tensorflow-docs
+tensorflow
+moviepy
