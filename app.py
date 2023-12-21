@@ -18,9 +18,8 @@ BATCH_SIZE = 64
 EPOCHS = 12
 MAX_SEQ_LENGTH = 20
 NUM_FEATURES = 2048
-
 # Load the pre-trained sequence model
-sequence_model = tf.keras.models.load_model('C:\\Users\\ehsan\\Downloads\\final_model.h5')
+sequence_model = tf.keras.models.load_model('/home/ubuntu/20_20/final_model.h5')
 
 # Build the feature extractor model
 def build_feature_extractor():
@@ -41,7 +40,7 @@ def build_feature_extractor():
 feature_extractor = build_feature_extractor()
 
 # Read the training dataset
-train_df = pd.read_csv("C:\\Users\\ehsan\\Desktop\\exrisizes\\filoger\\20_20\\train.csv")
+train_df = pd.read_csv("/home/ubuntu/20_20/train.csv")
 
 # Function to prepare a single video for prediction
 def prepare_single_video(frames):
@@ -108,9 +107,11 @@ def chart(values, labels):
     plt.xticks(fontsize=10)
     plt.yticks(fontsize=10)
 
-    plt.savefig("C:\\Users\\ehsan\\Desktop\\exrisizes\\filoger\\20_20\\app_photos\\chart.jpg")
+    plt.savefig("/home/ubuntu/20_20/app_photos/chart.jpg")
+
 
 # Function for sequence prediction on a video
+    
 def sequence_prediction(path):
     class_vocab = label_processor.get_vocabulary()
 
@@ -141,8 +142,8 @@ def sequence_prediction(path):
 # Function to convert images to GIF
 def to_gif(images):
     converted_images = images.astype(np.uint8)
-    imageio.mimsave("C:\\Users\\ehsan\\Desktop\\exrisizes\\filoger\\20_20\\app_photos\\animation.gif", converted_images, fps=10)
-    return embed.embed_file("C:\\Users\\ehsan\\Desktop\\exrisizes\\filoger\\20_20\\app_photos\\animation.gif")
+    imageio.mimsave("/home/ubuntu/20_20/app_photos/animation.gif", converted_images, fps=10)
+    return embed.embed_file("/home/ubuntu/20_20/app_photos/animation.gif")
 
 # Function to encode a file to base64
 def get_base64(file_path):
@@ -158,7 +159,7 @@ def set_background(png_file):
 
 # Function to convert a video to GIF
 def video_to_gif(video_path, gif_path):
-    clip = VideoFileClip(video_path)
+    clip = VideoFileClip(video_path,resize_algorithm='fast_bilinear')
     duration = clip.duration
     if duration > 30:
         clip = clip.subclip(0, 30)
@@ -168,14 +169,14 @@ def main():
     from PIL import Image
 
     # Set the background image
-    set_background('C:\\Users\\ehsan\\Desktop\\exrisizes\\filoger\\20_20\\app_photos\\beautiful-blue-particles-bokeh-wallpaper.jpg')
+    set_background('/home/ubuntu/20_20/app_photos/beautiful-blue-particles-bokeh-wallpaper.jpg')
 
     # Display an image
-    image_v_2 = Image.open('C:\\Users\\ehsan\\Desktop\\exrisizes\\filoger\\20_20\\app_photos\\image.png')
+    image_v_2 = Image.open('/home/ubuntu/20_20/app_photos/image.png')
     st.image(image_v_2, caption='Welcome', use_column_width=True)
 
     # Sidebar
-    image_v_4 = Image.open('C:\\Users\\ehsan\\Desktop\\exrisizes\\filoger\\20_20\\app_photos\\circle-logo-1024x1024.png')
+    image_v_4 = Image.open('/home/ubuntu/20_20/app_photos/circle-logo-1024x1024.png')
     st.sidebar.image(image_v_4, caption='', use_column_width=True)
     st.sidebar.markdown("""[App made for Filoger Data Science School](https://filoger.com/)""")
     st.sidebar.markdown('---')
@@ -195,53 +196,56 @@ def main():
     st.sidebar.header(("MMB Team 👨🏻‍💻"))
     st.sidebar.markdown(("""
     - [Mohammad Reza ASAN](https://github.com/Mohammadrezaasan)
-    - [Masoud Kaviani]()
+    - [Masoud Kaviani](https://www.linkedin.com/in/masoud-kaviani-1527b4157/)
     - [Babak Heidari](https://www.linkedin.com/in/babak-heydari)
     """))
 
     uploaded_file = st.file_uploader("", type=["mp4", "gif", "mov", "avi"])
-
     if uploaded_file is not None:
-        if not os.path.exists("C:\\Users\\ehsan\\Desktop\\exrisizes\\filoger\\20_20\\uploads"):
-            os.makedirs("C:\\Users\\ehsan\\Desktop\\exrisizes\\filoger\\20_20\\uploads")
+        try :
+            if not os.path.exists("/home/ubuntu/20_20/uploads"):
+                os.makedirs("/home/ubuntu/20_20/uploads")
 
-        # Save the uploaded video file
-        video_path = os.path.join("C:\\Users\\ehsan\\Desktop\\exrisizes\\filoger\\20_20\\uploads\\", uploaded_file.name)
-        with open(video_path, "wb") as f:
-            f.write(uploaded_file.getbuffer())
+            # Save the uploaded video file
+            video_path = os.path.join("/home/ubuntu/20_20/uploads/", uploaded_file.name)
+            with open(video_path, "wb") as f:
+                f.write(uploaded_file.getbuffer())
 
-        test_video = video_path
+            test_video = video_path
 
-        # Convert the video to GIF
-        video_to_gif(video_path, 'C:\\Users\\ehsan\\Desktop\\exrisizes\\filoger\\20_20\\app_photos\\animation.gif')
+            # Convert the video to GIF
+            # video_to_gif(video_path, '/home/ubuntu/20_20/app_photos/animation.gif')
 
-        with open("C:\\Users\\ehsan\\Desktop\\exrisizes\\filoger\\20_20\\app_photos\\animation.gif", "rb") as f:
-            data = f.read()
+            # with open("/home/ubuntu/20_20/app_photos/animation.gif", "rb") as f:
+            #     data = f.read()
 
-        # Display the converted GIF
-        st.markdown(f'<img src="data:image/gif;base64,{base64.b64encode(data).decode()}" alt="local gif" width=200>',
-                    unsafe_allow_html=True)
+            # # Display the converted GIF
+            # st.markdown(f'<img src="data:image/gif;base64,{base64.b64encode(data).decode()}" alt="local gif" width=200>',
+            #             unsafe_allow_html=True)
 
-        st.markdown("---")
-        st.subheader("Prediction Results:")
-        progress_text = "Operation in progress. Please wait."
-        my_bar = st.progress(0, text=progress_text)
-        
-        # Perform prediction
-        for percent_complete in range(88):
-            time.sleep(0.01)
-            my_bar.progress(percent_complete + 1, text=progress_text)
-        time.sleep(1)
-        test_frames = sequence_prediction(test_video)
+            st.markdown("---")
+            st.subheader("Prediction Results:")
+            progress_text = "Operation in progress. Please wait."
+            my_bar = st.progress(0, text=progress_text)
+            
+            # Perform prediction
+            for percent_complete in range(88):
+                time.sleep(0.01)
+                my_bar.progress(percent_complete + 1, text=progress_text)
+            time.sleep(1)
+            test_frames = sequence_prediction(test_video)
 
-        # Display the data chart
-        path = 'C:/Users/ehsan/Desktop/exrisizes/filoger/20_20/app_photos/chart.jpg'
-        image = Image.open(path)
-        st.image(image, caption='Data chart', use_column_width=True)
-        my_bar.progress(100, 'The operation is complete.')
-        time.sleep(1)
-        my_bar.empty()
-        st.balloons()
+            # Display the data chart
+            path = '/home/ubuntu/20_20/app_photos/chart.jpg'
+            image = Image.open(path)
+            st.image(image, caption='Data chart', use_column_width=True)
+            my_bar.progress(100, 'The operation is complete.')
+            time.sleep(1)
+            my_bar.empty()
+            st.balloons()
+            os.remove(video_path)
+        except : 
+            st.write('Sorry, the process has encountered a problem :)')
 
 if __name__ == "__main__":
     main()
